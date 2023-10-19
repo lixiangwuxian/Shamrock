@@ -45,10 +45,11 @@ internal object NTServiceFetcher {
 
             initNTKernelListener(msgService, groupService)
             antiBackgroundMode(sessionService)
-            hookGuildListener(sessionService)
+            //hookGuildListener(sessionService)
         }
     }
 
+    /*
     private fun hookGuildListener(sessionService: IQQNTWrapperSession) {
         val guildService = sessionService.guildService
         XposedBridge.hookMethod(guildService::addKernelGuildListener.javaMethod, object: XC_MethodHook() {
@@ -59,6 +60,7 @@ internal object NTServiceFetcher {
             }
         })
     }
+    */
 
     private inline fun isInitForNt(hash: Int): Boolean {
         return hash == curKernelHash
