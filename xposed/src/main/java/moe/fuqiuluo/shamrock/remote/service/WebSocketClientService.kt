@@ -16,9 +16,9 @@ import moe.fuqiuluo.qqinterface.servlet.TicketSvc
 import moe.fuqiuluo.qqinterface.servlet.msg.toSegment
 
 internal class WebSocketClientService(
-    url: String,
+    override val address: String,
     wsHeaders: Map<String, String>
-) : WebSocketClientServlet(url, wsHeaders) {
+) : WebSocketClientServlet(address, wsHeaders) {
 
     override fun pushSelfPrivateSentMsg(
         record: MsgRecord,
