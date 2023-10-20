@@ -26,6 +26,7 @@ import moe.fuqiuluo.proto.protobufOf
 import moe.fuqiuluo.shamrock.tools.ifNullOrEmpty
 import moe.fuqiuluo.shamrock.tools.putBuf32Long
 import moe.fuqiuluo.shamrock.tools.slice
+import moe.fuqiuluo.shamrock.xposed.helper.AppRuntimeFetcher
 import moe.fuqiuluo.shamrock.xposed.helper.NTServiceFetcher
 import mqq.app.MobileQQ
 import tencent.im.oidb.cmd0x89a.oidb_0x89a
@@ -173,7 +174,7 @@ internal object GroupSvc: BaseSvc() {
     }
 
     fun getGroupInfo(groupId: String): TroopInfo {
-        val runtime = MobileQQ.getMobileQQ().waitAppRuntime() as QQAppInterface
+        val runtime = AppRuntimeFetcher.appRuntime as QQAppInterface
 
         val service = runtime
             .getRuntimeService(ITroopInfoService::class.java, "all")
@@ -402,7 +403,7 @@ internal object GroupSvc: BaseSvc() {
     }
 
     private fun refreshTroopMemberList(groupId: String) {
-        val app = MobileQQ.getMobileQQ().waitAppRuntime()
+        val app = AppRuntimeFetcher.appRuntime
         if (app !is AppInterface)
             throw RuntimeException("AppRuntime cannot cast to AppInterface")
         val businessHandler = app.getBusinessHandler(BusinessHandlerFactory.TROOP_MEMBER_LIST_HANDLER)
@@ -423,7 +424,7 @@ internal object GroupSvc: BaseSvc() {
     }
 
     private fun refreshTroopList() {
-        val app = MobileQQ.getMobileQQ().waitAppRuntime()
+        val app = AppRuntimeFetcher.appRuntime
         if (app !is AppInterface)
             throw RuntimeException("AppRuntime cannot cast to AppInterface")
         val businessHandler = app.getBusinessHandler(BusinessHandlerFactory.TROOP_LIST_HANDLER)
@@ -438,7 +439,7 @@ internal object GroupSvc: BaseSvc() {
     }
 
     private fun requestMemberInfo(groupId: Long, memberUin: Long) {
-        val app = MobileQQ.getMobileQQ().waitAppRuntime()
+        val app = AppRuntimeFetcher.appRuntime
         if (app !is AppInterface)
             throw RuntimeException("AppRuntime cannot cast to AppInterface")
         val businessHandler = app.getBusinessHandler(BusinessHandlerFactory.TROOP_MEMBER_CARD_HANDLER)
@@ -456,7 +457,7 @@ internal object GroupSvc: BaseSvc() {
     }
 
     private fun requestMemberInfoV2(groupId: Long, memberUin: Long) {
-        val app = MobileQQ.getMobileQQ().waitAppRuntime()
+        val app = AppRuntimeFetcher.appRuntime
         if (app !is AppInterface)
             throw RuntimeException("AppRuntime cannot cast to AppInterface")
         val businessHandler = app.getBusinessHandler(BusinessHandlerFactory.TROOP_MEMBER_CARD_HANDLER)

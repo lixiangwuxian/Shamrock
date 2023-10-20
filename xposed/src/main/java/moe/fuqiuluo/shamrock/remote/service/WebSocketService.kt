@@ -20,6 +20,7 @@ import moe.fuqiuluo.shamrock.tools.ifNullOrEmpty
 import moe.fuqiuluo.shamrock.tools.json
 import moe.fuqiuluo.shamrock.helper.Level
 import moe.fuqiuluo.shamrock.helper.LogCenter
+import moe.fuqiuluo.shamrock.xposed.helper.AppRuntimeFetcher
 import mqq.app.MobileQQ
 import org.java_websocket.WebSocket
 import org.java_websocket.handshake.ClientHandshake
@@ -28,7 +29,7 @@ import java.net.URI
 internal class WebSocketService(port: Int): WebSocketPushServlet(port) {
     fun pushMetaLifecycle() {
         GlobalScope.launch {
-            val runtime = MobileQQ.getMobileQQ().waitAppRuntime()
+            val runtime = AppRuntimeFetcher.appRuntime
             val curUin = runtime.currentAccountUin
             pushTo(PushMetaEvent(
                 time = System.currentTimeMillis() / 1000,

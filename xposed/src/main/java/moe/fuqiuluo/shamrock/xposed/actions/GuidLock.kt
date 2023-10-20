@@ -7,6 +7,7 @@ import moe.fuqiuluo.shamrock.helper.LogCenter
 import moe.fuqiuluo.shamrock.tools.hex2ByteArray
 import moe.fuqiuluo.shamrock.tools.hookMethod
 import moe.fuqiuluo.shamrock.utils.MMKVFetcher
+import moe.fuqiuluo.shamrock.utils.PlatformUtils
 import oicq.wlogin_sdk.tools.util
 import kotlin.coroutines.resume
 import kotlin.reflect.jvm.javaMethod
@@ -58,9 +59,17 @@ internal class GuidLock: IAction {
             }
         }
 
-        BeaconReport.getInstance().getQimei("0S200MNJT807V3GE", ctx) { qimei ->
-            LogCenter.log("QIMEI获取: ${qimei.qimei36}")
-            GuidLock.qimei = qimei.qimei36
+        if (PlatformUtils.isMqqPackage()) {
+            BeaconReport.getInstance().getQimei("0S200MNJT807V3GE", ctx) { qimei ->
+                LogCenter.log("QIMEI获取: ${qimei.qimei36}")
+                GuidLock.qimei = qimei.qimei36
+            }
+        } else {
+            BeaconReport.getInstance().getQimei { qimei ->
+                LogCenter.log("QIMEI获取: ${qimei.qimei36}")
+                GuidLock.qimei = qimei.qimei36
+            }
         }
+
     }
 }

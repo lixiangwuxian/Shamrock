@@ -13,7 +13,9 @@ import moe.fuqiuluo.shamrock.remote.service.config.ShamrockConfig
 import moe.fuqiuluo.shamrock.utils.PlatformUtils
 import moe.fuqiuluo.shamrock.helper.Level
 import moe.fuqiuluo.shamrock.helper.LogCenter
+import moe.fuqiuluo.shamrock.remote.HTTPServer
 import moe.fuqiuluo.shamrock.tools.ShamrockVersion
+import moe.fuqiuluo.shamrock.xposed.helper.AppRuntimeFetcher
 import mqq.app.MobileQQ
 import kotlin.concurrent.timer
 
@@ -23,11 +25,13 @@ internal class InitRemoteService : IAction {
 
         GlobalScope.launch {
             try {
-                moe.fuqiuluo.shamrock.remote.HTTPServer.start(ShamrockConfig.getPort())
+                HTTPServer.start(ShamrockConfig.getPort())
             } catch (e: Throwable) {
                 LogCenter.log(e.stackTraceToString(), Level.ERROR)
             }
         }
+
+        if (!PlatformUtils.isMqqPackage()) return
 
         if (ShamrockConfig.allowWebHook()) {
             GlobalPusher.register(moe.fuqiuluo.shamrock.remote.service.HttpService)
@@ -38,7 +42,7 @@ internal class InitRemoteService : IAction {
         }
 
         if (ShamrockConfig.openWebSocketClient()) {
-            val runtime = MobileQQ.getMobileQQ().waitAppRuntime()
+            val runtime = AppRuntimeFetcher.appRuntime
             val curUin = runtime.currentAccountUin
             val wsHeaders = hashMapOf(
                 "X-Client-Role" to "Universal",

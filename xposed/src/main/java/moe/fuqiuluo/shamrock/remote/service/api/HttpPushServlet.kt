@@ -15,6 +15,7 @@ import moe.fuqiuluo.shamrock.helper.Level
 import moe.fuqiuluo.shamrock.helper.LogCenter
 import moe.fuqiuluo.shamrock.tools.ShamrockVersion
 import moe.fuqiuluo.shamrock.utils.PlatformUtils
+import moe.fuqiuluo.shamrock.xposed.helper.AppRuntimeFetcher
 import mqq.app.MobileQQ
 import java.net.SocketException
 
@@ -36,7 +37,7 @@ internal abstract class HttpPushServlet : BasePushServlet {
 
                     header("User-Agent", "Shamrock/$ShamrockVersion")
                     header("X-QQ-Version", PlatformUtils.getClientVersion(MobileQQ.getContext()))
-                    val runtime = MobileQQ.getMobileQQ().waitAppRuntime()
+                    val runtime = AppRuntimeFetcher.appRuntime
                     val curUin = runtime.currentAccountUin
                     header("X-Self-ID", curUin)
                     header("X-OneBot-Version", "11")

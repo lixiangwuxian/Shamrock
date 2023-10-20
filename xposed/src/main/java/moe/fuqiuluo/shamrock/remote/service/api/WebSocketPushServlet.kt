@@ -20,6 +20,7 @@ import moe.fuqiuluo.shamrock.tools.GlobalJson
 import moe.fuqiuluo.shamrock.tools.*
 import moe.fuqiuluo.shamrock.helper.Level
 import moe.fuqiuluo.shamrock.helper.LogCenter
+import moe.fuqiuluo.shamrock.xposed.helper.AppRuntimeFetcher
 import mqq.app.MobileQQ
 import org.java_websocket.WebSocket
 import org.java_websocket.server.WebSocketServer
@@ -50,7 +51,7 @@ internal abstract class WebSocketPushServlet(
 
     init {
         timer("heartbeat", true, 0, 1000L * 5) {
-            val runtime = MobileQQ.getMobileQQ().waitAppRuntime()
+            val runtime = AppRuntimeFetcher.appRuntime
             val curUin = runtime.currentAccountUin
             broadcastAnyEvent(PushMetaEvent(
                 time = System.currentTimeMillis() / 1000,

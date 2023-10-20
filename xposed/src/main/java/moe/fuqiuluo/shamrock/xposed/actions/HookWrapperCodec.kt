@@ -42,8 +42,6 @@ internal class HookWrapperCodec: IAction {
     )
 
     override fun invoke(ctx: Context) {
-        if (!PlatformUtils.isMqqPackage()) return
-
         try {
             ToServiceMsg::class.java.hookMethod("setRequestSsoSeq").before {
                 val to = it.thisObject as ToServiceMsg

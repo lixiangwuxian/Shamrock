@@ -23,6 +23,7 @@ import moe.fuqiuluo.shamrock.remote.service.data.push.MetaEventType
 import moe.fuqiuluo.shamrock.remote.service.data.push.MetaSubType
 import moe.fuqiuluo.shamrock.remote.service.data.push.PostType
 import moe.fuqiuluo.shamrock.remote.service.data.push.PushMetaEvent
+import moe.fuqiuluo.shamrock.xposed.helper.AppRuntimeFetcher
 import mqq.app.MobileQQ
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
@@ -105,7 +106,7 @@ internal abstract class WebSocketClientServlet(
                 cancel()
                 return@timer
             }
-            val runtime = MobileQQ.getMobileQQ().waitAppRuntime()
+            val runtime = AppRuntimeFetcher.appRuntime
             val curUin = runtime.currentAccountUin
             send(
                 GlobalJson.encodeToString(
@@ -130,7 +131,7 @@ internal abstract class WebSocketClientServlet(
 
     private fun pushMetaLifecycle() {
         GlobalScope.launch {
-            val runtime = MobileQQ.getMobileQQ().waitAppRuntime()
+            val runtime = AppRuntimeFetcher.appRuntime
             val curUin = runtime.currentAccountUin
             pushTo(
                 PushMetaEvent(
