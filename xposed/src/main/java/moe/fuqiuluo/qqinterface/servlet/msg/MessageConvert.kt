@@ -254,17 +254,19 @@ internal object MsgConvert {
             }
             MsgConstant.KELEMTYPEREPLY -> {
                 val reply = element.replyElement
-                var msgId = reply.sourceMsgIdInRecords
-                if (msgId == 0L) {
-                    msgId = reply.replayMsgId
+                val msgId = reply.replayMsgId
+                val msgHash = if (msgId != 0L) {
+                    MessageHelper.generateMsgIdHash(chatType, msgId)
+                } else {
+                    MessageDB.getInstance().messageMappingDao()
+                        .queryByMsgSeq(chatType, peerId, reply.replayMsgSeq?.toInt() ?: 0)?.msgHashId
+                        ?: MessageHelper.generateMsgIdHash(chatType, reply.sourceMsgIdInRecords)
                 }
-
-                val mapping = MessageDB.getInstance().messageMappingDao().queryByMsgSeq(chatType, peerId, reply.replayMsgSeq.toInt())
 
                 return hashMapOf(
                     "type" to "reply".json,
                     "data" to JsonObject(mapOf(
-                        "id" to (mapping?.msgHashId ?: MessageHelper.generateMsgIdHash(chatType, msgId)).json,
+                        "id" to msgHash.json,
                     ))
                 )
             }

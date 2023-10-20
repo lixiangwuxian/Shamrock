@@ -29,9 +29,7 @@ internal object AioListener: IKernelMsgListener {
 
     private suspend fun handleMsg(record: MsgRecord) {
         try {
-            val rawMsg = record.elements.toCQCode(record.chatType, record.peerUin.toString())
-            if (rawMsg.isEmpty()) return
-            val msgHash = MessageHelper.convertMsgIdToMsgHash(record.chatType, record.msgId)
+            val msgHash = MessageHelper.generateMsgIdHash(record.chatType, record.msgId)
 
             MessageHelper.saveMsgMapping(
                 hash = msgHash,
@@ -43,9 +41,12 @@ internal object AioListener: IKernelMsgListener {
                 time = record.msgTime
             )
 
+            val rawMsg = record.elements.toCQCode(record.chatType, record.peerUin.toString())
+            if (rawMsg.isEmpty()) return
+
             when (record.chatType) {
                 MsgConstant.KCHATTYPEGROUP -> {
-                    LogCenter.log("群消息(group = ${record.peerName}(${record.peerUin}), uin = ${record.senderUin}, id = $msgHash, msg = $rawMsg)")
+                    LogCenter.log("群消息(group = ${record.peerName}(${record.peerUin}), uin = ${record.senderUin}, id = $msgHash|${record.msgSeq}, msg = $rawMsg)")
                     ShamrockConfig.getGroupMsgRule()?.let { rule ->
                         if (rule.black?.contains(record.peerUin) == true) return
                         if (rule.white?.contains(record.peerUin) == false) return
@@ -56,7 +57,7 @@ internal object AioListener: IKernelMsgListener {
                     }
                 }
                 MsgConstant.KCHATTYPEC2C -> {
-                    LogCenter.log("私聊消息(private = ${record.senderUin}, msg = $rawMsg)")
+                    LogCenter.log("私聊消息(private = ${record.senderUin}, id = $msgHash|${record.msgSeq}, msg = $rawMsg)")
                     ShamrockConfig.getPrivateRule()?.let { rule ->
                         if (rule.black?.contains(record.peerUin) == true) return
                         if (rule.white?.contains(record.peerUin) == false) return
@@ -76,11 +77,7 @@ internal object AioListener: IKernelMsgListener {
     override fun onAddSendMsg(record: MsgRecord) {
         GlobalScope.launch {
             try {
-                val rawMsg = record.elements.toCQCode(record.chatType, record.peerUin.toString())
-                if (rawMsg.isEmpty()) return@launch
-                LogCenter.log("发送消息: $rawMsg")
-
-                val msgHash = MessageHelper.convertMsgIdToMsgHash(record.chatType, record.msgId)
+                val msgHash = MessageHelper.generateMsgIdHash(record.chatType, record.msgId)
                 MessageHelper.saveMsgMapping(
                     hash = msgHash,
                     qqMsgId = record.msgId,
@@ -90,6 +87,11 @@ internal object AioListener: IKernelMsgListener {
                     msgSeq = record.msgSeq.toInt(),
                     time = record.msgTime
                 )
+
+                val rawMsg = record.elements.toCQCode(record.chatType, record.peerUin.toString())
+                if (rawMsg.isEmpty()) return@launch
+
+                LogCenter.log("发送消息($msgHash|${record.msgSeq}): $rawMsg")
 
                 if (!ShamrockConfig.enableSelfMsg())
                     return@launch
